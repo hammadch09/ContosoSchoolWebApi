@@ -1,4 +1,5 @@
-﻿using ContosoSchool.Data.Repository;
+﻿using ContosoSchool.Data;
+using ContosoSchool.Data.Repository;
 using ContosoSchool.Domain.Models;
 using System;
 using System.Collections.Generic;
@@ -11,9 +12,11 @@ namespace ContosoSchool.Application.Services.StudentService
     public class StudentService : IStudentService
     {
         private IRepository<Student> _repository;
-        public StudentService(IRepository<Student> repository)
+        private ApplicationDbContext _context;
+        public StudentService(IRepository<Student> repository, ApplicationDbContext context)
         {
             _repository = repository;
+            _context = context;
         }
         public void CreateStudent(Student student)
         {
@@ -41,6 +44,23 @@ namespace ContosoSchool.Application.Services.StudentService
         public void UpdateStudent(Student student)
         {
             _repository.Update(student);
+        }
+
+        public StudentResponse JsonResponse(Student student)
+        {
+            var Teacher = _context.Teacher
+                .Where(t => t.Id == student.TeacherId)
+                .FirstOrDefault();
+
+            var response = new StudentResponse
+            {
+                StudentId = student.Id,
+                StudentName = student.Name,
+                TeacherId = Teacher.Id,
+                TeacherName = Teacher.Name,
+                experience = Teacher.Experience
+            };
+            return response;
         }
     }
 }

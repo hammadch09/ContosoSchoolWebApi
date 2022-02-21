@@ -1,4 +1,7 @@
-﻿using ContosoSchool.Domain.Models;
+﻿using ContosoSchool.Application.Characters.Commands;
+using ContosoSchool.Application.Characters.Queries;
+using ContosoSchool.Domain.Models;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ContosoSchool.Controllers
@@ -8,9 +11,11 @@ namespace ContosoSchool.Controllers
     public class CharacterController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
-        public CharacterController(ApplicationDbContext context)
+        private readonly IMediator _mediator;
+        public CharacterController(ApplicationDbContext context, IMediator mediator)
         {
             _context = context;
+            _mediator = mediator;
         }
 
         [HttpGet]
@@ -18,16 +23,10 @@ namespace ContosoSchool.Controllers
         {
             var operators = await _context.Operators.FindAsync(OperatorId);
             if (operators == null)
-            {
                 return NotFound();
-            }
-            var characters = await _context.Characters
-                .Where(h => h.OperatorId == OperatorId)
-                .Include(c => c.Weapon)
-                .Include(c => c.Skills)
-                .ToListAsync();
 
-            return Ok(characters);
+            var characters = await _mediator.Send(new GetCharacterById.Query(OperatorId));
+            return characters == null ? null : Ok(characters);
         }
 
         [HttpPost]
@@ -38,17 +37,8 @@ namespace ContosoSchool.Controllers
             if (user == null)
                 return BadRequest($"Operator not found against Id {request.OperatorId}");
 
-            var newCharacter = new Character
-            {
-                Name = request.Name,
-                RpgClass = request.RpgClass,
-                OperatorId = request.OperatorId
-            };
-
-            _context.Characters.Add(newCharacter);
-            await _context.SaveChangesAsync();
-            
-            return await GetCharacter(newCharacter.OperatorId);
+            var res = await _mediator.Send(new AddCharacter.Command(request));
+            return res == null ? BadRequest() : Ok(res);
         }
 
         [HttpPost("weapon")]
@@ -60,36 +50,15 @@ namespace ContosoSchool.Controllers
                 return NotFound($"Character not found against Id {request.CharacterId}");
             }
 
-            var newWeapon = new Weapon
-            {
-                Name = request.Name,
-                Damage = request.Damage,
-                Character = character
-            };
-
-            _context.Weapons.Add(newWeapon);
-            await _context.SaveChangesAsync();
-
-            return Ok(character);
+            var res = await _mediator.Send(new AddWeapon.Command(request));
+            return Ok(res);
         }
 
         [HttpPost("skill")]
         public async Task<ActionResult<Character>> AddCharacterSkill(AddCharacterSkillDto request)
         {
-            var character = await _context.Characters.Where(c => c.Id == request.CharacterId)
-                .Include(c => c.Skills)
-                .FirstOrDefaultAsync();
-            if (character == null)
-                return NotFound();
-
-            var skill = await _context.Skills.FindAsync(request.SkillId);
-            if (skill == null)
-                return NotFound();
-
-            character.Skills.Add(skill);
-            await _context.SaveChangesAsync();
-
-            return Ok(character);
+            var res = await _mediator.Send(new AddCharacterSkill.Command(request));
+            return res != null ? Ok(res) : NotFound();
         }
     }
 }

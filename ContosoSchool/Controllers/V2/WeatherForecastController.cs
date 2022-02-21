@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace ContosoSchool.Controllers.V2
 {
     [ApiVersion("2.0")]
-    [Route(ApiRoutes.BaseRoute)]
+    [Route(ApiRoutes.VersioningBaseRoute)]
     [ApiController]
     public class WeatherForecastController : ControllerBase
     {

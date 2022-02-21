@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ContosoSchool.Controllers
 {
-    [Route("api/[controller]")]
+    [Route(ApiRoutes.BaseRoute)]
     [ApiController]
     public class StudentsController : ControllerBase
     {
@@ -20,7 +20,7 @@ namespace ContosoSchool.Controllers
         }
 
         // GET: api/Students
-        [HttpGet(nameof(GetAllStudent))]
+        [HttpGet(ApiRoutes.Student.GetAllRoute)]
         public IActionResult GetAllStudent()
         {
             var result = _studentService.GetAllStudents();
@@ -32,7 +32,7 @@ namespace ContosoSchool.Controllers
         }
 
         // GET: api/Students/5
-        [HttpGet(nameof(GetStudent))]
+        [HttpGet(ApiRoutes.Student.IdRoute)]
         public IActionResult GetStudent(int id)
         {
             var result = _studentService.GetStudent(id);
@@ -44,27 +44,40 @@ namespace ContosoSchool.Controllers
         }
 
         // PUT: api/Students/5
-        [HttpPut(nameof(UpdateStudent))]
-        public IActionResult UpdateStudent( Student student)
+        [HttpPut(ApiRoutes.Student.UpdateRoute)]
+        public IActionResult UpdateStudent(CreateStudentDto student, int id)
         {
-            _studentService.UpdateStudent(student);
-            return Ok("Updated Successfully!");
+            var studnt = new Student
+            {
+                Id = id,
+                Name = student.Name,
+                TeacherId = student.TeacherId,
+            };
+            _studentService.UpdateStudent(studnt);
+            return Ok(studnt);
         }
 
         // POST: api/Students
-        [HttpPost(nameof(CreateStudent))]
-        public IActionResult CreateStudent(Student student)
+        [HttpPost(ApiRoutes.Student.CreateRoute)]
+        public IActionResult CreateStudent(CreateStudentDto request)
         {
+            var student = new Student
+            {
+                Name = request.Name,
+                TeacherId = request.TeacherId,
+            };
             _studentService.CreateStudent(student);
-            return Ok("Student Created Successfully!");
+            var response = _studentService.JsonResponse(student);
+            return Ok(response);
         }
 
         // DELETE: api/Students/5
-        [HttpDelete(nameof(DeleteStudent))]
+        [HttpDelete(ApiRoutes.Student.DeleteRoute)]
         public IActionResult DeleteStudent(int id)
         {
             _studentService.DeleteStudent(id);
             return Ok("Deleted Successfully");
         }
+
     }
 }

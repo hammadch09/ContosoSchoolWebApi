@@ -1,6 +1,9 @@
 ﻿#nullable disable
 using ContosoSchool.Application.Services.TeacherService;
+using ContosoSchool.Application.Teachers.Commands;
+using ContosoSchool.Application.Teachers.Queries;
 using ContosoSchool.Domain.Models;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,11 +15,15 @@ namespace ContosoSchool.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly ITeacherService _teacherService;
+        private readonly IMediator _mediator;
 
-        public TeachersController(ApplicationDbContext context, ITeacherService teacherService)
+        public TeachersController(ApplicationDbContext context, 
+            ITeacherService teacherService, 
+            IMediator mediator)
         {
             _context = context;
             _teacherService = teacherService;
+            _mediator = mediator;
         }
 
         // GET: api/Teachers
@@ -24,63 +31,44 @@ namespace ContosoSchool.Controllers
         public async Task<ActionResult<List<Teacher>>> Get(int page)
         {
             if (page == 0)
-            {
                 return BadRequest("PageIdex is required");
-            }
 
-            if (_context.Teacher == null)
-            {
-                return NotFound();
-            }
-
-            var pagesResult = 3f;
-            var pagesCount = Math.Ceiling(_context.Teacher.Count() / pagesResult);
-
-            var teschers = await _context.Teacher
-                .Skip((page -1) * (int)pagesResult)
-                .Take((int)pagesResult)
-                .ToListAsync();
-
-            var response = new TeacherResponseDto
-            {
-                Teachers = teschers,
-                Pages = (int)pagesCount,
-                CurrentPage = page
-            };
-
-            return Ok(response);
+            var res = await _mediator.Send(new GetTeachersWithPagination.Query(page));
+            return res == null ? NotFound() : Ok(res);
         }
 
         // GET: api/Teachers/5
         [HttpGet(nameof(GetTeacher))]
-        public IActionResult GetTeacher(int id)
+        public async Task<IActionResult> GetTeacher(int id)
         {
-            var teacher = _teacherService.GetTeacher(id);
-            return Ok(teacher);
+            var res = await _mediator.Send(new GetTeacherById.Query(id));
+            return res == null ? NotFound() : Ok(res);
         }
 
         // PUT: api/Teachers/5
         [HttpPut("update/id")]
-        public IActionResult UpdateTeacher(Teacher teacher)
+        public async Task<IActionResult> UpdateTeacher(Teacher teacher)
         {
-            _teacherService.UpdateTeacher(teacher);
-            return Ok("Updated!");
+            var res = await _mediator.Send(new UpdateTeacher.Command(teacher));
+            return res == null ? NotFound() : Ok(res);
+            //_teacherService.UpdateTeacher(teacher);
+            //return Ok("Updated!");
         }
 
         // POST: api/Teachers
         [HttpPost("create")]
-        public IActionResult PostTeacher(Teacher teacher)
+        public async Task<IActionResult> AddTeacher(AddTeacherDto request)
         {
-            _teacherService.CreateTeacher(teacher);
-            return Ok("Created!");
+            var res = await _mediator.Send(new AddTeacher.Command(request));
+            return Ok(res);
         }
 
         // DELETE: api/Teachers/5
         [HttpDelete("delete/id")]
-        public IActionResult DeleteTeacher(int id)
+        public async Task<IActionResult> DeleteTeacher(int Id) 
         {
-            _teacherService.DeleteTeacher(id);
-            return Ok("Deleted");
+            var res = await _mediator.Send(new DeleteTeacher.Command(Id));
+            return Ok(res);
         }
     }
 }
