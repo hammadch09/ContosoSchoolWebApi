@@ -9,6 +9,6 @@ namespace ContosoSchool.Application.Services.UserService
     public interface IUserService
     {
         string GetMyName();
-        string GetHammad(string hammad);
+        string GetAnyName(string hammad);
     }
 }

@@ -1,7 +1,6 @@
 ﻿using ContosoSchool.Application.Classrooms.Commands;
 using ContosoSchool.Application.Classrooms.Queries;
 using MediatR;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ContosoSchool.Controllers
@@ -16,18 +15,18 @@ namespace ContosoSchool.Controllers
             _mediator = mediator;
         }
 
-        [HttpGet]
+        [HttpGet(ApiRoutes.Classroom.GetById)]
         public async Task<IActionResult> GetClassroomById(int Id)
         {
             var response = await _mediator.Send(new GetClassroomById.Query(Id));
             return response == null ? NotFound() : Ok(response);
         }
 
-        [HttpPost]
+        [HttpPost(ApiRoutes.Classroom.AddClassroom)]
         public async Task<IActionResult> AddClassroom(AddClassroom.Command command)
             => Ok(await _mediator.Send(command));
 
-        [HttpGet("AllClassroom")]
+        [HttpGet(ApiRoutes.Classroom.GetAll)]
         public async Task<IActionResult> GetAllClassroom()
         {
             var res = await _mediator.Send(new GetAllClassroom.Query());

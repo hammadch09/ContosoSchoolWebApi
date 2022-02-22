@@ -5,11 +5,10 @@ using ContosoSchool.Application.Teachers.Queries;
 using ContosoSchool.Domain.Models;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace ContosoSchool.Controllers
 {
-    [Route("api/[controller]")]
+    [Route(ApiRoutes.BaseRoute)]
     [ApiController]
     public class TeachersController : ControllerBase
     {
@@ -27,7 +26,7 @@ namespace ContosoSchool.Controllers
         }
 
         // GET: api/Teachers
-        [HttpGet("paginate/id")]
+        [HttpGet(ApiRoutes.Teacher.GetPaginatedRoute)]
         public async Task<ActionResult<List<Teacher>>> Get(int page)
         {
             if (page == 0)
@@ -46,17 +45,15 @@ namespace ContosoSchool.Controllers
         }
 
         // PUT: api/Teachers/5
-        [HttpPut("update/id")]
+        [HttpPut(ApiRoutes.Teacher.UpdateRoute)]
         public async Task<IActionResult> UpdateTeacher(Teacher teacher)
         {
             var res = await _mediator.Send(new UpdateTeacher.Command(teacher));
             return res == null ? NotFound() : Ok(res);
-            //_teacherService.UpdateTeacher(teacher);
-            //return Ok("Updated!");
         }
 
         // POST: api/Teachers
-        [HttpPost("create")]
+        [HttpPost(ApiRoutes.Teacher.AddRoute)]
         public async Task<IActionResult> AddTeacher(AddTeacherDto request)
         {
             var res = await _mediator.Send(new AddTeacher.Command(request));
@@ -64,7 +61,7 @@ namespace ContosoSchool.Controllers
         }
 
         // DELETE: api/Teachers/5
-        [HttpDelete("delete/id")]
+        [HttpDelete(ApiRoutes.Teacher.DeleteRoute)]
         public async Task<IActionResult> DeleteTeacher(int Id) 
         {
             var res = await _mediator.Send(new DeleteTeacher.Command(Id));

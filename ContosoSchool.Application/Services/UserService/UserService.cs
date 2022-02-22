@@ -23,7 +23,7 @@ namespace ContosoSchool.Application.Services.UserService
             return result;
         }
 
-        public string GetHammad(string hammad)
+        public string GetAnyName(string hammad)
         {
             if (_httpContextAccessor.HttpContext != null)
                 return hammad;

@@ -24,7 +24,7 @@ namespace ContosoSchool.Application.Characters.Queries
                     .Include(x => x.Skills)
                     .ToListAsync();
 
-                return new Response(characters);
+                return characters == null ? null : new Response(characters);
             }
         }
         public record Response(List<Character> character);

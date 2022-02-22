@@ -7,7 +7,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace ContosoSchool.Controllers
 {
-    [Route("api/[controller]")]
+    [Route(ApiRoutes.BaseRoute)]
     [ApiController]
     public class AuthController : ControllerBase
     {
@@ -17,7 +17,6 @@ namespace ContosoSchool.Controllers
 
         public AuthController
             (
-                IConfiguration configuration, 
                 ApplicationDbContext context, 
                 IUserService userService,
                 IAuthService authService
@@ -32,8 +31,8 @@ namespace ContosoSchool.Controllers
         public ActionResult<object> GetMe()
         {
             var userName = _userService.GetMyName();
-            var hammad = _userService.GetHammad("Hammad Arshad");
-            return Ok(new { userName, hammad });
+            var name = _userService.GetAnyName("Hammad Arshad");
+            return Ok(new { userName, name });
 
             //var username = User?.Identity?.Name;
             //var username2 = User?.FindFirstValue(ClaimTypes.Name);
@@ -42,7 +41,7 @@ namespace ContosoSchool.Controllers
         }
 
 
-        [HttpPost("register")]
+        [HttpPost(ApiRoutes.Auth.Register)]
         public async Task<ActionResult<User>> Register(UserDto request)
         {
 
@@ -72,7 +71,7 @@ namespace ContosoSchool.Controllers
         }
 
 
-        [HttpPost("login")]
+        [HttpPost(ApiRoutes.Auth.Login)]
         public async Task<ActionResult<string>> Login([FromForm][Required]string username, [FromForm][Required]string password)
         {
             if (!_authService.UserNameExsist(username))

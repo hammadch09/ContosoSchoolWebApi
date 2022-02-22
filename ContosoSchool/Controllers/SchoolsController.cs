@@ -2,14 +2,13 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using ContosoSchool.Domain.Models;
-using Microsoft.EntityFrameworkCore;
 using MediatR;
 using ContosoSchool.Application.Schools.Queries;
 using ContosoSchool.Application.Schools.Commands;
 
 namespace ContosoSchool.Controllers
 {
-    [Route("api/[controller]")]
+    [Route(ApiRoutes.BaseRoute)]
     [ApiController]
     [Authorize]
     public class SchoolsController : ControllerBase
@@ -22,7 +21,6 @@ namespace ContosoSchool.Controllers
             _mediator = mediator;
         }
 
-        // GET: api/Schools
         [HttpGet] 
         public async Task<ActionResult<IEnumerable<School>>> GetSchool()
         {
@@ -30,25 +28,20 @@ namespace ContosoSchool.Controllers
             return Ok(schools);
         }
 
-        // GET: api/Schools/5
-        [HttpGet("{id}")]
+        [HttpGet(ApiRoutes.School.IdRoute)]
         public async Task<ActionResult<School>> GetSchool(int id)
         {
             var school = await _mediator.Send(new GetSchoolById.Query(id));
             return Ok(school);
         }
 
-        // PUT: api/Schools/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("id")]
+        [HttpPut(ApiRoutes.School.Update)]
         public async Task<IActionResult> PutSchool(School school)
         {
             var res = await _mediator.Send(new UpdateSchool.Command(school));
             return Ok(res);
         }
 
-        // POST: api/Schools
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         public async Task<ActionResult<School>> PostSchool(School school)
         {
@@ -56,8 +49,7 @@ namespace ContosoSchool.Controllers
             return Ok(res);
         }
 
-        // DELETE: api/Schools/5
-        [HttpDelete("{id}")]
+        [HttpDelete(ApiRoutes.School.IdRoute)]
         public async Task<IActionResult> DeleteSchool(int id)
         {
             var school = await _mediator.Send(new DeleteSchool.Command(id));
