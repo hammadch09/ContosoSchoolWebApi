@@ -10,10 +10,12 @@ namespace ContosoSchool.Controllers
     public class ClassroomController : ControllerBase
     {
         private readonly IMediator _mediator;
+
         public ClassroomController(IMediator mediator)
         {
             _mediator = mediator;
         }
+
 
         [HttpGet(ApiRoutes.Classroom.GetById)]
         public async Task<IActionResult> GetClassroomById(int Id)
@@ -22,9 +24,13 @@ namespace ContosoSchool.Controllers
             return response == null ? NotFound() : Ok(response);
         }
 
+
         [HttpPost(ApiRoutes.Classroom.AddClassroom)]
         public async Task<IActionResult> AddClassroom(AddClassroom.Command command)
-            => Ok(await _mediator.Send(command));
+        {
+            return Ok(await _mediator.Send(command));
+        }
+
 
         [HttpGet(ApiRoutes.Classroom.GetAll)]
         public async Task<IActionResult> GetAllClassroom()

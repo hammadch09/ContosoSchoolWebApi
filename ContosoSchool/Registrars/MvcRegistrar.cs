@@ -1,4 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using ContosoSchool.Application.Validation;
+using ContosoSchool.Behavior;
+using ContosoSchool.Behaviors;
+using ContosoSchool.Filters;
+using MediatR;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Versioning;
 
 namespace ContosoSchool.Registrars
@@ -7,7 +12,14 @@ namespace ContosoSchool.Registrars
     {
         public void RegisterServices(WebApplicationBuilder builder)
         {
-            builder.Services.AddControllers();
+            builder.Services.AddControllers(options => options.Filters.Add(typeof(ResponseMappingFilter)));
+
+            // Add Validation
+            builder.Services.AddValidators();
+
+            // Add Behaviors
+            builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+            builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
 
             builder.Services.AddApiVersioning(config =>
             {

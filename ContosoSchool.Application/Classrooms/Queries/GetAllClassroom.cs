@@ -1,4 +1,6 @@
-﻿using ContosoSchool.Data;
+﻿using ContosoSchool.Application.DTOs;
+using ContosoSchool.Application.Validation;
+using ContosoSchool.Data;
 using ContosoSchool.Domain.Models;
 using MediatR;
 
@@ -6,9 +8,24 @@ namespace ContosoSchool.Application.Classrooms.Queries
 {
     public class GetAllClassroom
     {
-        public record Query() : IRequest<IEnumerable<Classroom>>;
+        public record Query() : IRequest<Response>;
 
-        public class Handler : IRequestHandler<Query, IEnumerable<Classroom>>
+        public class Validator : IValidationHandler<Query>
+        {
+
+            private readonly ApplicationDbContext _ctx;
+
+            public Validator(ApplicationDbContext ctx) => _ctx = ctx;
+            public async Task<ValidationResult> Validate(Query request)
+            {
+                if (!_ctx.Classroom.Any())
+                    return ValidationResult.Fail("No record found");
+
+                return ValidationResult.Success;
+            }
+        }
+
+        public class Handler : IRequestHandler<Query, Response>
         {
             private readonly ApplicationDbContext _context;
 
@@ -17,12 +34,16 @@ namespace ContosoSchool.Application.Classrooms.Queries
                 _context = context;
             }
 
-            public async Task<IEnumerable<Classroom>> 
-                Handle(Query request, CancellationToken cancellationToken)
+            public async Task<Response> Handle(Query request, CancellationToken cancellationToken)
             {
                 var result = _context.Classroom.ToList();
-                return result;
+                return new Response { Classrooms = result };
             }
+        }
+
+        public record Response : CQRSResponse
+        {
+            public List<Classroom> Classrooms { get; init; }
         }
     }
 }

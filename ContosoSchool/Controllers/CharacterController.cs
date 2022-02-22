@@ -21,6 +21,7 @@ namespace ContosoSchool.Controllers
         [HttpGet(ApiRoutes.Character.GetCharacter)]
         public async Task<ActionResult<List<Character>>> GetCharacter(int OperatorId)
         {
+            throw new Exception("This is test");
             var operators = await _context.Operators.FindAsync(OperatorId);
             if (operators == null)
                 return NotFound();

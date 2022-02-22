@@ -8,8 +8,8 @@ namespace ContosoSchool.Domain.Models
 {
     public class CreateCharacterDto
     {
-        public string Name { get; set; } = "Character";
-        public string RpgClass { get; set; } = "Knight";
+        public string Name { get; set; }
+        public string RpgClass { get; set; }
         public int OperatorId { get; set; }
     }
 }

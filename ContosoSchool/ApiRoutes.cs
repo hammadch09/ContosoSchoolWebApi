@@ -4,7 +4,6 @@
     {
         public const string VersioningBaseRoute = "api/v{version:ApiVersion}/[controller]";
         public const string BaseRoute = "api/[controller]";
-
         public class Student
         {
             public const string IdRoute = "{id}";
@@ -27,7 +26,7 @@
         }
         public class Classroom
         {
-            public const string GetById = "/{id}";
+            public const string GetById = "id";
             public const string GetAll = "Get";
             public const string AddClassroom = "AddClassroom";
         }

@@ -1,4 +1,6 @@
-﻿using ContosoSchool.Data;
+﻿using ContosoSchool.Application.DTOs;
+using ContosoSchool.Application.Validation;
+using ContosoSchool.Data;
 using ContosoSchool.Domain.Models;
 using MediatR;
 
@@ -10,11 +12,11 @@ namespace ContosoSchool.Application.Characters.Commands
 
         public class Handler : IRequestHandler<Command, Response>
         {
+
             private readonly ApplicationDbContext _context;
-            public Handler(ApplicationDbContext context)
-            {
-                _context = context;
-            }
+
+            public Handler(ApplicationDbContext context) => _context = context;
+           
             public async Task<Response> Handle(Command request, CancellationToken cancellationToken)
             {
                 var character = _context.Characters.Add(new Character
@@ -23,11 +25,14 @@ namespace ContosoSchool.Application.Characters.Commands
                     RpgClass = request.characterDto.RpgClass,
                     OperatorId = request.characterDto.OperatorId
                 });
-                await _context.SaveChangesAsync(cancellationToken: cancellationToken);
-                return character == null ? null : new Response(character.Entity);
+                await _context.SaveChangesAsync();
+                return new Response { character = character.Entity };
             }
         }
 
-        public record Response(Character character);
+        public record Response : CQRSResponse
+        {
+            public Character character { get; init; }
+        }
     }
 }

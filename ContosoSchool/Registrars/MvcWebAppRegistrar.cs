@@ -6,6 +6,15 @@ namespace ContosoSchool.Registrars
     {
         public void RegisterPipelineComponents(WebApplication app)
         {
+            app.UseExceptionHandler(app =>
+            {
+                app.Run(async context =>
+                {
+                    // Handle exception here
+                    await context.Response.WriteAsJsonAsync(new { Error = "Sorry something went wrong"});
+                });
+            });
+
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();

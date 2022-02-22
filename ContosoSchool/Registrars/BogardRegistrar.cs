@@ -9,7 +9,7 @@ using MediatR;
 
 namespace ContosoSchool.Registrars
 {
-    public class MediatorRegistrar : IWebApplicationBuilderRegistrar
+    public class BogardRegistrar : IWebApplicationBuilderRegistrar
     {
         public void RegisterServices(WebApplicationBuilder builder)
         {
