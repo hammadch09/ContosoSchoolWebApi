@@ -22,7 +22,7 @@ namespace ContosoSchool.Controllers.V2
         }
 
         //[MapToApiVersion("1.0")]
-        [HttpGet(Name = "GetWeatherForecast"), Authorize(Roles = "Admin")]
+        [HttpGet(Name = "GetWeatherForecast")]
         public IEnumerable<WeatherForecast> Get(int id)
         {
             return Enumerable.Range(1, 5).Select(index => new WeatherForecast

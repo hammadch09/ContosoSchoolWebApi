@@ -10,6 +10,23 @@ namespace ContosoSchool.Application.Characters.Commands
     {
         public record Command(CreateCharacterDto characterDto) : IRequest<Response>;
 
+        public class Validator : IValidationHandler<Command>
+        {
+
+            private readonly ApplicationDbContext _context;
+
+            public Validator(ApplicationDbContext context) => _context = context;
+            
+            public async Task<ValidationResult> Validate(Command request)
+            {
+                var res = _context.Characters.FirstOrDefault(x => x.Name == request.characterDto.Name);
+                if (res != null)
+                    return ValidationResult.Fail("Character is already exsist.");
+
+                return ValidationResult.Success;
+            }
+        }
+
         public class Handler : IRequestHandler<Command, Response>
         {
 
