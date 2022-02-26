@@ -42,7 +42,7 @@ namespace ContosoSchool.Controllers
 
 
         [HttpPost(ApiRoutes.Auth.Register)]
-        public async Task<ActionResult<User>> Register(UserDto request)
+        public async Task<ActionResult<UserResponse>> Register(UserDto request)
         {
 
             if (request.Username == "" || request.Username == null)
@@ -67,12 +67,19 @@ namespace ContosoSchool.Controllers
             context.Users.Add(user);
             await context.SaveChangesAsync();
 
-            return Ok(user);
+            var response = new UserResponse
+            {
+                Status = true,
+                Message = "Registered Successfully",
+                User = user,
+            };
+
+            return Ok(response);
         }
 
 
         [HttpPost(ApiRoutes.Auth.Login)]
-        public async Task<ActionResult<string>> Login([FromForm][Required]string username, [FromForm][Required]string password)
+        public async Task<ActionResult<UserResponse>> Login([FromForm][Required]string username, [FromForm][Required]string password)
         {
             if (!_authService.UserNameExsist(username))
             {
@@ -93,7 +100,14 @@ namespace ContosoSchool.Controllers
             userObj.token = token;
             await context.SaveChangesAsync();
 
-            return Ok(token);
+            var response = new UserResponse
+            {
+                Status = true,
+                Message = "loggedIn Successfully",
+                User = userObj
+            };
+
+            return Ok(response);
         }
     }
 }
